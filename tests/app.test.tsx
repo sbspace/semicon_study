@@ -6,6 +6,7 @@ import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
+import { AuthProvider, type AuthClient } from '../src/auth/AuthContext.js';
 import { AppRoutes } from '../src/app/App.js';
 import { BrowserContentTransport, contentBaseUrl } from '../src/app/content.js';
 import { ContentProvider } from '../src/app/ContentContext.js';
@@ -21,7 +22,7 @@ import type {
 } from '../src/content/types.js';
 import { createContentIndex } from '../src/content/write.js';
 import { ProgressProvider } from '../src/progress/ProgressContext.js';
-import { PROGRESS_STORAGE_KEY, type ProgressStorage } from '../src/progress/types.js';
+import type { LessonProgressRow, ProgressRepository } from '../src/progress/repository.js';
 
 let catalog: ContentCatalog;
 let index: ContentIndex;
@@ -36,10 +37,32 @@ class MemoryTransport implements ContentTransport {
   }
 }
 
-class MemoryProgressStorage implements ProgressStorage {
-  readonly values = new Map<string, string>();
-  getItem(key: string) { return this.values.get(key) ?? null; }
-  setItem(key: string, value: string) { this.values.set(key, value); }
+class MemoryProgressRepository implements ProgressRepository {
+  readonly rows = new Map<string, LessonProgressRow>();
+  readonly upserts: Array<{ userId: string; lessonId: string; completed: boolean; completedAt: string | null }> = [];
+  seed(userId: string, row: LessonProgressRow) { this.rows.set(`${userId}:${row.lesson_id}`, row); }
+  async list(userId: string) {
+    return [...this.rows.entries()]
+      .filter(([key]) => key.startsWith(`${userId}:`))
+      .map(([, row]) => ({ ...row }));
+  }
+  async upsert(userId: string, lessonId: string, completed: boolean, completedAt: string | null) {
+    this.upserts.push({ userId, lessonId, completed, completedAt });
+    this.seed(userId, { lesson_id: lessonId, completed, completed_at: completedAt });
+  }
+}
+
+const TEST_USER_ID = '00000000-0000-0000-0000-000000000001';
+
+function authenticatedClient(userId = TEST_USER_ID): AuthClient {
+  const session = { user: { id: userId, email: 'learner@example.com' } };
+  return {
+    getSession: vi.fn(async () => ({ data: { session }, error: null })),
+    onAuthStateChange: vi.fn(() => ({ data: { subscription: { unsubscribe: vi.fn() } } })),
+    signInWithPassword: vi.fn(),
+    signOut: vi.fn(),
+    signUp: vi.fn(),
+  } as unknown as AuthClient;
 }
 
 beforeAll(async () => {
@@ -57,14 +80,16 @@ function loader(): ContentLoader {
   return new ContentLoader(new MemoryTransport(values));
 }
 
-function renderRoute(route: string, storage: ProgressStorage | null = null) {
+function renderRoute(route: string, repository: ProgressRepository = new MemoryProgressRepository()) {
   return render(
     <ContentProvider loader={loader()}>
-      <ProgressProvider storage={storage} now={() => '2026-09-13T00:00:00.000Z'}>
-        <MemoryRouter initialEntries={[route]}>
-          <AppRoutes />
-        </MemoryRouter>
-      </ProgressProvider>
+      <AuthProvider client={authenticatedClient()}>
+        <ProgressProvider repository={repository} now={() => '2026-09-13T00:00:00.000Z'}>
+          <MemoryRouter initialEntries={[route]}>
+            <AppRoutes />
+          </MemoryRouter>
+        </ProgressProvider>
+      </AuthProvider>
     </ContentProvider>,
   );
 }
@@ -161,25 +186,32 @@ describe('learning application routes', () => {
     expect(screen.queryByText(/Missing documents/)).not.toBeInTheDocument();
   });
 
-  it('records a visit and lets a learner complete and uncomplete a lesson', async () => {
-    const storage = new MemoryProgressStorage();
-    renderRoute('/learn/m00-l01', storage);
+  it('upserts completion and cancellation for the authenticated learner', async () => {
+    const repository = new MemoryProgressRepository();
+    renderRoute('/learn/m00-l01', repository);
     const completeButton = await screen.findByRole('button', { name: '학습 완료' });
-    await waitFor(() => expect(JSON.parse(storage.values.get(PROGRESS_STORAGE_KEY)!).lastVisitedId).toBe('m00-l01'));
     fireEvent.click(completeButton);
     expect(await screen.findByText('학습 완료됨')).toBeInTheDocument();
     expect(screen.getByLabelText('현재 학습 상태: 완료')).toHaveTextContent('완료');
-    expect(JSON.parse(storage.values.get(PROGRESS_STORAGE_KEY)!).completedById['m00-l01'].contentRevision)
-      .toBe(index.documentsById['m00-l01']!.revision);
+    await waitFor(() => expect(repository.upserts).toContainEqual({
+      userId: TEST_USER_ID,
+      lessonId: 'm00-l01',
+      completed: true,
+      completedAt: '2026-09-13T00:00:00.000Z',
+    }));
     fireEvent.click(screen.getByRole('button', { name: '완료 취소' }));
     expect(await screen.findByRole('button', { name: '학습 완료' })).toBeInTheDocument();
     expect(screen.getByLabelText('현재 학습 상태: 미완료')).toHaveTextContent('미완료');
-    expect(JSON.parse(storage.values.get(PROGRESS_STORAGE_KEY)!).completedById['m00-l01']).toBeUndefined();
+    await waitFor(() => expect(repository.upserts.at(-1)).toEqual({
+      userId: TEST_USER_ID,
+      lessonId: 'm00-l01',
+      completed: false,
+      completedAt: null,
+    }));
   });
 
   it('keeps manual Lesson completion independent from an incorrect Quiz result', async () => {
-    const storage = new MemoryProgressStorage();
-    const view = renderRoute('/learn/m00-l01', storage);
+    const view = renderRoute('/learn/m00-l01');
     const completeButton = await screen.findByRole('button', { name: '학습 완료' });
     const card = view.container.querySelector<HTMLElement>('.quiz-question-card');
     expect(card).not.toBeNull();
@@ -190,39 +222,27 @@ describe('learning application routes', () => {
     expect(await screen.findByText('학습 완료됨')).toBeInTheDocument();
   });
 
-  it('shows restored progress on Home and keeps the completed lesson accessible', async () => {
-    const storage = new MemoryProgressStorage();
-    storage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify({
-      version: 1,
-      completedById: {
-        'm00-l01': { completedAt: '2026-09-12T00:00:00.000Z', contentRevision: 'older-revision' },
-      },
-      lastVisitedId: 'm00-l01',
-    }));
-    const view = renderRoute('/', storage);
+  it('shows restored Supabase progress on Home and keeps the completed lesson accessible', async () => {
+    const repository = new MemoryProgressRepository();
+    repository.seed(TEST_USER_ID, { lesson_id: 'm00-l01', completed: true, completed_at: '2026-09-12T00:00:00.000Z' });
+    const view = renderRoute('/', repository);
     expect(await screen.findByText('1 / 53')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /이어서 학습/ })).toHaveAttribute('href', '/learn/m00-l01');
+    expect(screen.getByRole('link', { name: /첫 수업 시작하기/ })).toHaveAttribute('href', '/learn/m00-l01');
     cleanup();
-    renderRoute('/learn/m00-l01', storage);
+    renderRoute('/learn/m00-l01', repository);
     expect(await screen.findByText('학습 완료됨')).toBeInTheDocument();
-    expect(screen.getByText('완료 후 내용이 업데이트됨')).toBeInTheDocument();
     expect(view.baseElement).toBeDefined();
   });
 
   it('shows completion state and module progress in Curriculum', async () => {
-    const storage = new MemoryProgressStorage();
-    storage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify({
-      version: 1,
-      completedById: {
-        'm01-l01': { completedAt: '2026-09-12T00:00:00.000Z', contentRevision: index.documentsById['m01-l01']!.revision },
-        'm01-review': { completedAt: '2026-09-12T00:00:00.000Z', contentRevision: index.documentsById['m01-review']!.revision },
-      },
-    }));
-    renderRoute('/curriculum', storage);
+    const repository = new MemoryProgressRepository();
+    repository.seed(TEST_USER_ID, { lesson_id: 'm01-l01', completed: true, completed_at: '2026-09-12T00:00:00.000Z' });
+    repository.seed(TEST_USER_ID, { lesson_id: 'm01-review', completed: true, completed_at: '2026-09-12T00:00:00.000Z' });
+    renderRoute('/curriculum', repository);
     await screen.findByRole('heading', { name: index.curriculum.title });
-    expect(screen.getAllByText('1 / 7 완료 · 14%').length).toBeGreaterThan(0);
-    expect(screen.getByLabelText('Lesson 완료')).toBeInTheDocument();
-    expect(screen.getByLabelText('Review 완료')).toBeInTheDocument();
+    expect((await screen.findAllByText('1 / 7 완료 · 14%')).length).toBeGreaterThan(0);
+    expect(await screen.findByLabelText('Lesson 완료')).toBeInTheDocument();
+    expect(await screen.findByLabelText('Review 완료')).toBeInTheDocument();
   });
 });
 

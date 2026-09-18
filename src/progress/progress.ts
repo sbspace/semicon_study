@@ -38,7 +38,7 @@ export function isCompletionOutdated(
   currentRevision: string,
 ): boolean {
   const record = progress.completedById[id];
-  return record !== undefined && record.contentRevision !== currentRevision;
+  return record?.contentRevision !== undefined && record.contentRevision !== currentRevision;
 }
 
 function metrics(ids: ContentId[], progress: LearningProgress): ProgressMetrics {

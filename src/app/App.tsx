@@ -1,6 +1,7 @@
 import { Component, lazy, Suspense, type ErrorInfo, type ReactNode } from 'react';
 import { Link, NavLink, Route, Routes } from 'react-router-dom';
 
+import { AuthForm } from '../auth/AuthContext.js';
 import { ErrorState } from './pageShared.js';
 
 const HomePage = lazy(() => import('./pages/HomePage.js'));
@@ -69,10 +70,13 @@ export function App() {
       <header className="site-header">
         <div className="header-inner">
           <Link className="brand" to="/"><span className="brand-mark">S</span><span><strong>SEMI</strong><small>Semiconductor Learning</small></span></Link>
-          <nav aria-label="주요 메뉴">
-            <NavLink to="/" end>Home</NavLink>
-            <NavLink to="/curriculum">Curriculum</NavLink>
-          </nav>
+          <div className="header-actions">
+            <nav aria-label="주요 메뉴">
+              <NavLink to="/" end>Home</NavLink>
+              <NavLink to="/curriculum">Curriculum</NavLink>
+            </nav>
+            <AuthForm />
+          </div>
         </div>
       </header>
       <AppRoutes />

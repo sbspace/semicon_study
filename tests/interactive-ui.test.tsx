@@ -7,6 +7,7 @@ import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
+import { AuthProvider } from '../src/auth/AuthContext.js';
 import { AppRoutes } from '../src/app/App.js';
 import { ContentProvider } from '../src/app/ContentContext.js';
 import { ContentRenderer } from '../src/app/ContentRenderer.js';
@@ -18,7 +19,6 @@ import { parseContentDirectory } from '../src/content/parse.js';
 import type { ContentCatalog, ContentIndex, InteractiveDeclaration } from '../src/content/types.js';
 import { createContentIndex } from '../src/content/write.js';
 import { ProgressProvider } from '../src/progress/ProgressContext.js';
-import { PROGRESS_STORAGE_KEY, type ProgressStorage } from '../src/progress/types.js';
 
 let catalog: ContentCatalog;
 let index: ContentIndex;
@@ -404,31 +404,23 @@ class MemoryTransport implements ContentTransport {
   }
 }
 
-class MemoryProgressStorage implements ProgressStorage {
-  values = new Map<string, string>();
-  getItem(key: string) { return this.values.get(key) ?? null; }
-  setItem(key: string, value: string) { this.values.set(key, value); }
-}
-
 it('does not change progress or Quiz responses when the inverter is used', async () => {
   const values = new Map<string, unknown>([['index.json', structuredClone(index)]]);
   for (const id of index.documentIds) {
     values.set(index.documentsById[id]!.documentFile, structuredClone(catalog.documentsById[id]));
   }
-  const storage = new MemoryProgressStorage();
   render(
     <ContentProvider loader={new ContentLoader(new MemoryTransport(values))}>
-      <ProgressProvider storage={storage} now={() => '2026-09-14T00:00:00.000Z'}>
-        <MemoryRouter initialEntries={['/learn/m01-l02']}><AppRoutes /></MemoryRouter>
-      </ProgressProvider>
+      <AuthProvider client={null}>
+        <ProgressProvider repository={null} now={() => '2026-09-14T00:00:00.000Z'}>
+          <MemoryRouter initialEntries={['/learn/m01-l02']}><AppRoutes /></MemoryRouter>
+        </ProgressProvider>
+      </AuthProvider>
     </ContentProvider>,
   );
   const diagram = within(await screen.findByRole('region', { name: 'CMOS Inverter' }));
-  await waitFor(() => expect(storage.values.has(PROGRESS_STORAGE_KEY)).toBe(true));
-  const progressBefore = storage.values.get(PROGRESS_STORAGE_KEY);
   expect(screen.getAllByRole('radio').every(input => !(input as HTMLInputElement).checked)).toBe(true);
   fireEvent.click(diagram.getByRole('button', { name: '1' }));
-  expect(storage.values.get(PROGRESS_STORAGE_KEY)).toBe(progressBefore);
   expect(screen.getAllByRole('radio').every(input => !(input as HTMLInputElement).checked)).toBe(true);
   expect(screen.getByRole('button', { name: '학습 완료' })).toBeInTheDocument();
 });

@@ -17,6 +17,7 @@
     "node": ">=20"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.116.0",
     "katex": "0.18.7",
     "mdast-util-to-string": "4.0.0",
     "react": "19.3.0",

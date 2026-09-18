@@ -19,7 +19,7 @@ export default function LearnPage() {
   const { documentId } = useParams();
   const indexState = useContentIndex();
   const documentState = useContentDocument(documentId);
-  const { progress, complete, uncomplete, visit } = useProgress();
+  const { progress, complete, uncomplete, visit, loading: progressLoading, notice, savingIds } = useProgress();
   const loadedDocument = documentState.data;
   useEffect(() => {
     if (loadedDocument?.kind === 'lesson' || loadedDocument?.kind === 'review' || loadedDocument?.kind === 'supplement') {
@@ -36,6 +36,7 @@ export default function LearnPage() {
   const canComplete = document.kind === 'lesson' || document.kind === 'review' || document.kind === 'supplement';
   const completed = canComplete && isCompleted(progress, document.id);
   const outdated = canComplete && isCompletionOutdated(progress, document.id, document.revision);
+  const saving = savingIds.has(document.id);
   return (
     <main className="learn-page">
       <header className="lesson-header page-width-narrow">
@@ -63,10 +64,11 @@ export default function LearnPage() {
               <div><strong>{completed ? '학습 완료됨' : '이 문서를 다 읽었나요?'}</strong>{outdated && <small>완료 후 내용이 업데이트됨</small>}</div>
             </div>
             {completed
-              ? <button type="button" className="completion-cancel" onClick={() => uncomplete(document.id)}>완료 취소</button>
-              : <button type="button" className="button primary" onClick={() => complete(document.id, document.revision)}>학습 완료</button>}
+              ? <button type="button" className="completion-cancel" disabled={saving || progressLoading} onClick={() => uncomplete(document.id)}>{saving ? '저장 중…' : '완료 취소'}</button>
+              : <button type="button" className="button primary" disabled={saving || progressLoading} onClick={() => complete(document.id, document.revision)}>{saving ? '저장 중…' : progressLoading ? '진도 불러오는 중…' : '학습 완료'}</button>}
           </section>
         )}
+        {notice && <p className="progress-notice" role="status">{notice}</p>}
         <LessonNavigation document={document} index={indexState.data} />
       </div>
     </main>
