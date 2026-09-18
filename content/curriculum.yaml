@@ -1,0 +1,359 @@
+schema_version: '1.0'
+content_version: 2026.09.16
+language: ko
+title: 반도체 기초부터 제품과 산업까지
+description: 소자·회로·칩·공정·제품을 천천히 연결하는 반도체 수업
+last_updated: '2026-09-16'
+modules:
+- id: m00
+  number: 0
+  title: 반도체/전기 기초
+  description: 전기와 반도체 재료에서 소자의 출발점을 이해한다.
+  file: module-00-basics/module.md
+  lessons:
+  - id: m00-l01
+    title: 반도체·소자·웨이퍼·다이·칩 — 일단 이것부터 구분하자
+    file: module-00-basics/lesson-01.md
+    estimated_minutes: 15
+  - id: m00-l02
+    title: 전압·전류가 뭐고, 어떻게 `0`과 `1`이 되는가?
+    file: module-00-basics/lesson-02.md
+    estimated_minutes: 12
+  - id: m00-l03
+    title: 저항·커패시터는 뭐고, 왜 트랜지스터만으로 끝나지 않을까?
+    file: module-00-basics/lesson-03.md
+    estimated_minutes: 15
+    extension_minutes: 5
+  - id: m00-l04
+    title: 트랜지스터는 어떻게 전기를 켜고 끌까? — MOSFET의 Gate · Source · Drain
+    file: module-00-basics/lesson-04.md
+    estimated_minutes: 15
+    extension_minutes: 10
+  - id: m00-l05
+    title: N형·P형 반도체 — 실리콘에 왜 일부러 불순물을 넣을까?
+    file: module-00-basics/lesson-05.md
+    estimated_minutes: 15
+  review:
+    id: m00-review
+    title: 반도체/전기 기초 전체 복습
+    file: module-00-basics/review.md
+    estimated_minutes: 15
+- id: m01
+  number: 1
+  title: 트랜지스터와 CMOS
+  description: 스위치에서 논리·계산·기억 회로로 연결한다.
+  file: module-01-cmos/module.md
+  lessons:
+  - id: m01-l01
+    title: NMOS와 PMOS — 왜 트랜지스터가 두 종류나 필요할까?
+    file: module-01-cmos/lesson-01.md
+    estimated_minutes: 12
+    extension_minutes: 5
+  - id: m01-l02
+    title: CMOS Inverter — 트랜지스터가 어떻게 실제로 0과 1을 만드는가
+    file: module-01-cmos/lesson-02.md
+    estimated_minutes: 12
+  - id: m01-l03
+    title: NAND와 NOR — 트랜지스터 여러 개를 연결하면 어떻게 논리가 만들어질까?
+    file: module-01-cmos/lesson-03.md
+    estimated_minutes: 12
+  - id: m01-l04
+    title: XOR와 Half Adder — 논리게이트가 실제로 덧셈을 한다
+    file: module-01-cmos/lesson-04.md
+    estimated_minutes: 12
+  - id: m01-l05
+    title: Full Adder와 여러 비트 덧셈 — CPU는 큰 숫자를 어떻게 더할까?
+    file: module-01-cmos/lesson-05.md
+    estimated_minutes: 12
+  - id: m01-l06
+    title: Clock, Flip-Flop, Register — 계산한 0과 1을 어떻게 기억할까?
+    file: module-01-cmos/lesson-06.md
+    estimated_minutes: 12
+  - id: m01-l07
+    title: SRAM 6T Cell — CMOS로 1 bit를 계속 기억하는 방법
+    file: module-01-cmos/lesson-07.md
+    estimated_minutes: 15
+    extension_minutes: 5
+  review:
+    id: m01-review
+    title: 트랜지스터와 CMOS 전체 복습
+    file: module-01-cmos/review.md
+    estimated_minutes: 15
+  supplements:
+  - id: m01-s-half-adder
+    title: XOR와 Half Adder — 다른 회차 원문
+    file: module-01-cmos/supplement-half-adder.md
+    estimated_minutes: 15
+  - id: m01-s-sram
+    title: SRAM 6T와 Register — 다른 회차 원문
+    file: module-01-cmos/supplement-sram.md
+    estimated_minutes: 15
+- id: m02
+  number: 2
+  title: 칩 구조
+  description: 회로의 계층, 다이 내부 배선, 외부 연결을 이해한다.
+  file: module-02-chip/module.md
+  lessons:
+  - id: m02-l01
+    title: 칩 안의 계층 구조 — 트랜지스터 수십억 개는 어떻게 하나의 칩이 될까?
+    file: module-02-chip/lesson-01.md
+    estimated_minutes: 15
+  - id: m02-l02
+    title: Die 안의 Core·Cache·I/O는 어디에 있을까? — Floorplan
+    file: module-02-chip/lesson-02.md
+    estimated_minutes: 15
+  - id: m02-l03
+    title: 칩의 위아래 구조 — 트랜지스터 위에는 무엇이 쌓여 있을까?
+    file: module-02-chip/lesson-03.md
+    estimated_minutes: 15
+  - id: m02-l04
+    title: 칩 안에서 신호와 전원은 어떻게 이동할까? — Signal / Clock / VDD / GND
+    file: module-02-chip/lesson-04.md
+    estimated_minutes: 15
+  - id: m02-l05
+    title: 칩은 바깥세상과 어떻게 연결될까? — Pad → Bump → Package → PCB
+    file: module-02-chip/lesson-05.md
+    estimated_minutes: 15
+    extension_minutes: 5
+  - id: m02-l06
+    title: 큰 Die 하나 vs 여러 작은 Die — Monolithic와 Chiplet
+    file: module-02-chip/lesson-06.md
+    estimated_minutes: 15
+  review:
+    id: m02-review
+    title: 칩 구조 전체 복습
+    file: module-02-chip/review.md
+    estimated_minutes: 15
+  supplements:
+  - id: m02-s-feol-beol
+    title: FEOL과 BEOL — 후속 회차 원문
+    file: module-02-chip/supplement-feol-beol.md
+    estimated_minutes: 15
+  - id: m02-s-floorplan
+    title: 칩의 평면 구조 — 후속 회차 원문
+    file: module-02-chip/supplement-floorplan.md
+    estimated_minutes: 15
+  - id: m02-s-wafer-shot
+    title: Wafer·Shot·Reticle·Scribe Line
+    file: module-02-chip/supplement-wafer-shot.md
+    estimated_minutes: 15
+- id: m03
+  number: 3
+  title: 반도체 공정
+  description: 재료를 쌓고 패턴을 옮기고 가공하여 칩을 만드는 과정을 이해한다.
+  file: module-03-process/module.md
+  lessons:
+  - id: m03-l01
+    title: 반도체 공정의 큰 그림 — 웨이퍼 위에 어떻게 수십억 개의 트랜지스터를 만들까?
+    file: module-03-process/lesson-01.md
+    estimated_minutes: 15
+    extension_minutes: 5
+  - id: m03-l02
+    title: Photo 공정 — 빛으로 웨이퍼에 회로의 위치를 그린다
+    file: module-03-process/lesson-02.md
+    estimated_minutes: 15
+    extension_minutes: 5
+  - id: m03-l03
+    title: Etch — Photo가 그린 패턴대로 실제 막을 깎는다
+    file: module-03-process/lesson-03.md
+    estimated_minutes: 15
+  - id: m03-l04
+    title: CVD & Deposition — 웨이퍼 위의 Film은 어떻게 만들어질까?
+    file: module-03-process/lesson-04.md
+    estimated_minutes: 15
+  - id: m03-l05
+    title: Metal 공정 — 수십억 개의 트랜지스터를 어떻게 서로 연결할까?
+    file: module-03-process/lesson-05.md
+    estimated_minutes: 15
+  - id: m03-l06
+    title: CMP — 왜 반도체를 계속 평평하게 만들어야 할까?
+    file: module-03-process/lesson-06.md
+    estimated_minutes: 15
+    extension_minutes: 5
+  - id: m03-l07
+    title: Implant — 실리콘에 전기적 성질을 심는다
+    file: module-03-process/lesson-07.md
+    estimated_minutes: 15
+  - id: m03-l08
+    title: Diffusion & Thermal Process — 열을 이용해 반도체의 성질과 막을 바꾼다
+    file: module-03-process/lesson-08.md
+    estimated_minutes: 15
+  - id: m03-l09
+    title: Clean — 왜 웨이퍼를 공정 중간중간 계속 씻을까?
+    file: module-03-process/lesson-09.md
+    estimated_minutes: 15
+  review:
+    id: m03-review
+    title: 반도체 공정 전체 복습
+    file: module-03-process/review.md
+    estimated_minutes: 15
+- id: m04
+  number: 4
+  title: 제품 구조와 CPU/GPU/NPU/SoC/메모리
+  description: CPU·GPU·NPU와 메모리를 보면서, 배운 회로들이 제품 안에서 어떤 일을 하는지 연결해보자.
+  file: module-04-products/module.md
+  lessons:
+  - id: m04-l01
+    title: CPU는 명령을 어떻게 실행할까?
+    file: module-04-products/lesson-01.md
+    estimated_minutes: 12
+  - id: m04-l02
+    title: GPU는 왜 같은 일을 많이 처리하는 데 유리할까?
+    file: module-04-products/lesson-02.md
+    estimated_minutes: 12
+  - id: m04-l03
+    title: NPU는 무엇을 특별하게 만드는가?
+    file: module-04-products/lesson-03.md
+    estimated_minutes: 12
+  - id: m04-l04
+    title: SoC는 여러 역할을 어떻게 한데 묶을까?
+    file: module-04-products/lesson-04.md
+    estimated_minutes: 12
+  - id: m04-l05
+    title: SRAM·DRAM·NAND는 왜 함께 필요할까?
+    file: module-04-products/lesson-05.md
+    estimated_minutes: 12
+  - id: m04-l06
+    title: 연산기가 빨라도 메모리를 기다리는 이유
+    file: module-04-products/lesson-06.md
+    estimated_minutes: 12
+  review:
+    id: m04-review
+    title: 제품 구조와 CPU/GPU/NPU/SoC/메모리 전체 복습
+    file: module-04-products/review.md
+    estimated_minutes: 15
+- id: m05
+  number: 5
+  title: 첨단 공정
+  description: 더 작게 만든 소자를 어떻게 제어하고, 패턴을 만들고, 전기를 공급하는지 하나씩 보자.
+  file: module-05-advanced/module.md
+  lessons:
+  - id: m05-l01
+    title: 작게 만들면 무엇이 좋아지고 무엇이 어려워질까?
+    file: module-05-advanced/lesson-01.md
+    estimated_minutes: 12
+  - id: m05-l02
+    title: FinFET에서 GAA로 — 채널을 더 잘 감싸기
+    file: module-05-advanced/lesson-02.md
+    estimated_minutes: 12
+  - id: m05-l03
+    title: EUV는 작은 패턴을 어떻게 더 선명하게 만들까?
+    file: module-05-advanced/lesson-03.md
+    estimated_minutes: 12
+  - id: m05-l04
+    title: 후면 전력 공급 — 신호 길과 전기 길을 나누기
+    file: module-05-advanced/lesson-04.md
+    estimated_minutes: 12
+  review:
+    id: m05-review
+    title: 첨단 공정 전체 복습
+    file: module-05-advanced/review.md
+    estimated_minutes: 15
+- id: m06
+  number: 6
+  title: 패키징
+  description: 완성된 다이를 바깥과 연결하고, 여러 다이를 묶고, 실제로 쓸 수 있는 제품으로 만들어보자.
+  file: module-06-packaging/module.md
+  lessons:
+  - id: m06-l01
+    title: Package는 포장 말고 무슨 일을 할까?
+    file: module-06-packaging/lesson-01.md
+    estimated_minutes: 12
+  - id: m06-l02
+    title: 2.5D와 3D — 옆으로 연결할까, 위로 쌓을까?
+    file: module-06-packaging/lesson-02.md
+    estimated_minutes: 12
+  - id: m06-l03
+    title: TSV와 접합 — 위로 쌓인 Die를 어떻게 잇나?
+    file: module-06-packaging/lesson-03.md
+    estimated_minutes: 12
+  - id: m06-l04
+    title: 좋은 Die를 모으면 좋은 Package가 될까?
+    file: module-06-packaging/lesson-04.md
+    estimated_minutes: 12
+  review:
+    id: m06-review
+    title: 패키징 전체 복습
+    file: module-06-packaging/review.md
+    estimated_minutes: 15
+- id: m07
+  number: 7
+  title: HBM
+  description: DRAM을 쌓은 구조와 넓은 데이터 통로를 연결해서 HBM이 왜 필요한지 알아보자.
+  file: module-07-hbm/module.md
+  lessons:
+  - id: m07-l01
+    title: HBM은 왜 데이터 통로를 넓힐까?
+    file: module-07-hbm/lesson-01.md
+    estimated_minutes: 12
+  - id: m07-l02
+    title: HBM 스택 안과 밖 — DRAM, TSV, 베이스 다이
+    file: module-07-hbm/lesson-02.md
+    estimated_minutes: 12
+  - id: m07-l03
+    title: 8H·12H와 GB·TB/s를 따로 읽기
+    file: module-07-hbm/lesson-03.md
+    estimated_minutes: 12
+  - id: m07-l04
+    title: HBM의 병목은 어디에 남을까?
+    file: module-07-hbm/lesson-04.md
+    estimated_minutes: 12
+  review:
+    id: m07-review
+    title: HBM 전체 복습
+    file: module-07-hbm/review.md
+    estimated_minutes: 15
+- id: m08
+  number: 8
+  title: 파운드리 생태계
+  description: 설계·제조·조립을 누가 맡는지, 하나의 칩이 제품으로 나오는 길을 따라가보자.
+  file: module-08-foundry/module.md
+  lessons:
+  - id: m08-l01
+    title: 칩 하나를 만드는 회사들의 역할
+    file: module-08-foundry/lesson-01.md
+    estimated_minutes: 12
+  - id: m08-l02
+    title: PDK·EDA·IP — 설계와 공장을 잇는 약속
+    file: module-08-foundry/lesson-02.md
+    estimated_minutes: 12
+  - id: m08-l03
+    title: 설계가 실제 칩이 되기까지 — Tape-out
+    file: module-08-foundry/lesson-03.md
+    estimated_minutes: 12
+  - id: m08-l04
+    title: 좋은 공정 선택은 가장 작은 숫자 선택일까?
+    file: module-08-foundry/lesson-04.md
+    estimated_minutes: 12
+  review:
+    id: m08-review
+    title: 파운드리 생태계 전체 복습
+    file: module-08-foundry/review.md
+    estimated_minutes: 15
+- id: m09
+  number: 9
+  title: 최신 트렌드
+  description: 지금까지 배운 개념으로 실제 기술 발표를 읽어보자. 이름보다 해결하는 문제와 확인된 단계를 보는 거야.
+  file: module-09-trends/module.md
+  lessons:
+  - id: m09-l01
+    title: 2026년 첨단 공정 뉴스 — 구조와 양산 단계를 나눠 읽기
+    file: module-09-trends/lesson-01.md
+    estimated_minutes: 12
+  - id: m09-l02
+    title: High-NA EUV — 선명한 패턴을 양산 기술로 만들기
+    file: module-09-trends/lesson-02.md
+    estimated_minutes: 12
+  - id: m09-l03
+    title: HBM4 발표 읽기 — 용량·대역폭·출하 상태
+    file: module-09-trends/lesson-03.md
+    estimated_minutes: 12
+  - id: m09-l04
+    title: 칩렛 연결 표준 — 여러 회사의 다이를 함께 쓰려면
+    file: module-09-trends/lesson-04.md
+    estimated_minutes: 12
+  review:
+    id: m09-review
+    title: 최신 트렌드 전체 복습
+    file: module-09-trends/review.md
+    estimated_minutes: 15

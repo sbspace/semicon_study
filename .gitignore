@@ -1,0 +1,26 @@
+node_modules/
+coverage/
+dist/
+.generated/
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+.dev.vars
+.dev.vars.*
+
+# Local logs and package-manager diagnostics
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Local tooling and operating-system files
+.wrangler/
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.local
